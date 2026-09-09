@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventarioApi.Migrations
 {
     [DbContext(typeof(InventarioContext))]
-    [Migration("20260430143901_Empleados-Externos")]
-    partial class EmpleadosExternos
+    [Migration("20260909204407_Initial-Create")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -102,6 +102,9 @@ namespace InventarioApi.Migrations
                     b.Property<string>("NumeroAsignado")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Serie")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -161,6 +164,9 @@ namespace InventarioApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Proyecto")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SolvenciaNo")
                         .HasColumnType("nvarchar(max)");
 
@@ -173,6 +179,37 @@ namespace InventarioApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HojasResponsabilidad");
+                });
+
+            modelBuilder.Entity("HojaResponsabilidadVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DatosJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaGuardado")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HojaResponsabilidadId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumeroVersion")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HojaResponsabilidadId");
+
+                    b.ToTable("HojaResponsabilidadVersiones", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("InventarioApi.Models.Asignacion", b =>
@@ -206,9 +243,79 @@ namespace InventarioApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Ubicacion")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Asignaciones");
+                });
+
+            modelBuilder.Entity("InventarioApi.Models.AsignacionComunal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodificacionEquipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Correlativo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaAsignacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ubicacion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AsignacionesComunales");
+                });
+
+            modelBuilder.Entity("InventarioApi.Models.AsignacionComunalVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AsignacionComunalId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DatosJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaGuardado")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NumeroVersion")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AsignacionComunalId");
+
+                    b.ToTable("AsignacionComunalVersiones");
                 });
 
             modelBuilder.Entity("InventarioApi.Models.BajaActivo", b =>
@@ -234,6 +341,9 @@ namespace InventarioApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NumeroBaja")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UbicacionActual")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -254,13 +364,15 @@ namespace InventarioApi.Migrations
                         .HasColumnName("Departamento");
 
                     b.Property<string>("Descripcion")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Descripcion");
 
                     b.HasKey("Codigo");
 
-                    b.ToTable("departamento");
+                    b.ToTable("departamento", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("InventarioApi.Models.EmpleadoExterno", b =>
@@ -292,6 +404,10 @@ namespace InventarioApi.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<string>("Proyecto")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
                     b.Property<string>("Puesto")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -313,16 +429,13 @@ namespace InventarioApi.Migrations
                         .HasColumnName("Empleado");
 
                     b.Property<string>("Departamento")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Nombre")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Nombre");
 
                     b.Property<string>("Puesto")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("U_NOMBRE_CC");
 
@@ -330,7 +443,10 @@ namespace InventarioApi.Migrations
 
                     b.HasIndex("Departamento");
 
-                    b.ToTable("Empleado", (string)null);
+                    b.ToTable("Empleado", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("InventarioApi.Models.HojaSolvencia", b =>
@@ -384,6 +500,88 @@ namespace InventarioApi.Migrations
                     b.ToTable("Solvencias");
                 });
 
+            modelBuilder.Entity("InventarioApi.Models.Inmueble", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CatalogoActivoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaFactura")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaOrdenCompra")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FichaTecnica")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NombreCatalogoActivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NombreProveedor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroFacturaElectronica")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroOrdenCompra")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inmuebles");
+                });
+
+            modelBuilder.Entity("InventarioApi.Models.InmuebleArchivo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FechaSubida")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InmuebleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NombreOriginal")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RutaArchivo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoDocumento")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InmuebleId");
+
+                    b.ToTable("InmuebleArchivos");
+                });
+
             modelBuilder.Entity("InventarioApi.Models.Mantenimiento", b =>
                 {
                     b.Property<int>("Id")
@@ -418,6 +616,48 @@ namespace InventarioApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Mantenimientos");
+                });
+
+            modelBuilder.Entity("InventarioApi.Models.PolizaSeguro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Aseguradora")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoberturasEspecificas")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaRenovacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GestionReclamosSiniestros")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InmuebleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NumeroPoliza")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InmuebleId");
+
+                    b.ToTable("PolizasSeguro");
                 });
 
             modelBuilder.Entity("InventarioApi.Models.Solicitud", b =>
@@ -725,6 +965,9 @@ namespace InventarioApi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CodigoProveedor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Estado")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -736,7 +979,6 @@ namespace InventarioApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Identificacion")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MotivoSalida")
@@ -748,19 +990,18 @@ namespace InventarioApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NombreContacto")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NombreProveedor")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PersonaRetira")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TelefonoProveedor")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoRetiro")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UbicacionRetorno")
@@ -883,6 +1124,72 @@ namespace InventarioApi.Migrations
                     b.ToTable("Ubicaciones");
                 });
 
+            modelBuilder.Entity("InventoryApi.Models.AlertaServicioVehiculo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Atendida")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("FechaAlerta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("KilometrajeAlerta")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notas")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoAlerta")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehiculoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehiculoId");
+
+                    b.ToTable("AlertasServicioVehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.BitacoraFallaVehiculo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DescripcionFalla")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Estado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReportadoPor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Solucion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehiculoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehiculoId");
+
+                    b.ToTable("BitacoraFallasVehiculo");
+                });
+
             modelBuilder.Entity("InventoryApi.Models.Equipo", b =>
                 {
                     b.Property<int>("Id")
@@ -956,6 +1263,382 @@ namespace InventarioApi.Migrations
                     b.ToTable("Equipos");
                 });
 
+            modelBuilder.Entity("InventoryApi.Models.HistorialReparacionVehiculo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("Costo")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Factura")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("KilometrajeEnReparacion")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Taller")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehiculoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehiculoId");
+
+                    b.ToTable("HistorialReparaciones");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.MantenimientoVehiculo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Estado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaProgramada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaRealizada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("KilometrajeProgramado")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TipoMantenimiento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehiculoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehiculoId");
+
+                    b.ToTable("MantenimientosVehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.MobiliarioEquipo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CatalogoActivos")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Codificacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comentarios")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ControlLlaves")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dimensiones")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EquipoTipo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Estado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EstadoFisicoActual")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Factura")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaIngreso")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HojaNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Marca")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Modelo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroAsignado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroChapaActivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrdenCompra")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Proveedor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponsableAnterior")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Serie")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoEquipo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ubicacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MobiliarioEquipos");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.PolizaSeguroVehiculo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Aseguradora")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Estado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaRenovacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NumeroPoliza")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Prima")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TipoCobertura")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehiculoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehiculoId");
+
+                    b.ToTable("PolizasSeguroVehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.ReporteDanio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EstadoReporte")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaReporte")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MobiliarioEquipoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReportadoPor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoIncidencia")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MobiliarioEquipoId");
+
+                    b.ToTable("ReportesDanios");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.ReporteEstadoFisicoVehiculo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DetalleCarroceria")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DetalleInterior")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DetalleMecanico")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EstadoGeneral")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EvaluadoPor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImagenesUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehiculoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehiculoId");
+
+                    b.ToTable("ReportesEstadoFisicoVehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.Vehiculo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Codificacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Comentarios")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescripcionCatalogo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EnCatalogo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Estado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Factura")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaActualizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaAsignacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaIngreso")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaUltimaActualizacionKm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HojaNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("KilometrajeActual")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("KilometrajeAsignacion")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Marca")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Modelo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ModeloAnio")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NumeroAsignado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrdenCompra")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Placa")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Proveedor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponsableActual")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponsableAnterior")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Serie")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoCombustible")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("TipoEquipo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ubicacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Vin")
+                        .HasMaxLength(17)
+                        .HasColumnType("nvarchar(17)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Placa");
+
+                    b.HasIndex("Vin");
+
+                    b.ToTable("Vehiculos");
+                });
+
             modelBuilder.Entity("HojaEmpleado", b =>
                 {
                     b.HasOne("HojaResponsabilidad", "HojaResponsabilidad")
@@ -978,13 +1661,33 @@ namespace InventarioApi.Migrations
                     b.Navigation("HojaResponsabilidad");
                 });
 
+            modelBuilder.Entity("HojaResponsabilidadVersion", b =>
+                {
+                    b.HasOne("HojaResponsabilidad", "HojaResponsabilidad")
+                        .WithMany()
+                        .HasForeignKey("HojaResponsabilidadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HojaResponsabilidad");
+                });
+
+            modelBuilder.Entity("InventarioApi.Models.AsignacionComunalVersion", b =>
+                {
+                    b.HasOne("InventarioApi.Models.AsignacionComunal", "AsignacionComunal")
+                        .WithMany()
+                        .HasForeignKey("AsignacionComunalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AsignacionComunal");
+                });
+
             modelBuilder.Entity("InventarioApi.Models.EmpleadoInfo", b =>
                 {
                     b.HasOne("InventarioApi.Models.Departamento", "DepartamentoInfo")
                         .WithMany("Empleados")
-                        .HasForeignKey("Departamento")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Departamento");
 
                     b.Navigation("DepartamentoInfo");
                 });
@@ -998,6 +1701,28 @@ namespace InventarioApi.Migrations
                         .IsRequired();
 
                     b.Navigation("HojaResponsabilidad");
+                });
+
+            modelBuilder.Entity("InventarioApi.Models.InmuebleArchivo", b =>
+                {
+                    b.HasOne("InventarioApi.Models.Inmueble", "Inmueble")
+                        .WithMany("Archivos")
+                        .HasForeignKey("InmuebleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Inmueble");
+                });
+
+            modelBuilder.Entity("InventarioApi.Models.PolizaSeguro", b =>
+                {
+                    b.HasOne("InventarioApi.Models.Inmueble", "Inmueble")
+                        .WithMany("Polizas")
+                        .HasForeignKey("InmuebleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Inmueble");
                 });
 
             modelBuilder.Entity("InventarioApi.Models.Suministros.EntradaSuministro", b =>
@@ -1071,6 +1796,83 @@ namespace InventarioApi.Migrations
                     b.Navigation("TrasladoRetorno");
                 });
 
+            modelBuilder.Entity("InventoryApi.Models.AlertaServicioVehiculo", b =>
+                {
+                    b.HasOne("InventoryApi.Models.Vehiculo", "Vehiculo")
+                        .WithMany("AlertasServicio")
+                        .HasForeignKey("VehiculoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.BitacoraFallaVehiculo", b =>
+                {
+                    b.HasOne("InventoryApi.Models.Vehiculo", "Vehiculo")
+                        .WithMany("BitacoraFallas")
+                        .HasForeignKey("VehiculoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.HistorialReparacionVehiculo", b =>
+                {
+                    b.HasOne("InventoryApi.Models.Vehiculo", "Vehiculo")
+                        .WithMany("HistorialReparaciones")
+                        .HasForeignKey("VehiculoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.MantenimientoVehiculo", b =>
+                {
+                    b.HasOne("InventoryApi.Models.Vehiculo", "Vehiculo")
+                        .WithMany("Mantenimientos")
+                        .HasForeignKey("VehiculoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.PolizaSeguroVehiculo", b =>
+                {
+                    b.HasOne("InventoryApi.Models.Vehiculo", "Vehiculo")
+                        .WithMany("PolizasSeguro")
+                        .HasForeignKey("VehiculoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehiculo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.ReporteDanio", b =>
+                {
+                    b.HasOne("InventoryApi.Models.MobiliarioEquipo", "MobiliarioEquipo")
+                        .WithMany("ReportesDanios")
+                        .HasForeignKey("MobiliarioEquipoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MobiliarioEquipo");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.ReporteEstadoFisicoVehiculo", b =>
+                {
+                    b.HasOne("InventoryApi.Models.Vehiculo", "Vehiculo")
+                        .WithMany("ReportesEstadoFisico")
+                        .HasForeignKey("VehiculoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehiculo");
+                });
+
             modelBuilder.Entity("HojaResponsabilidad", b =>
                 {
                     b.Navigation("Empleados");
@@ -1083,6 +1885,13 @@ namespace InventarioApi.Migrations
             modelBuilder.Entity("InventarioApi.Models.Departamento", b =>
                 {
                     b.Navigation("Empleados");
+                });
+
+            modelBuilder.Entity("InventarioApi.Models.Inmueble", b =>
+                {
+                    b.Navigation("Archivos");
+
+                    b.Navigation("Polizas");
                 });
 
             modelBuilder.Entity("InventarioApi.Models.Suministros.Suministro", b =>
@@ -1108,6 +1917,26 @@ namespace InventarioApi.Migrations
                     b.Navigation("Empleados");
 
                     b.Navigation("Equipos");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.MobiliarioEquipo", b =>
+                {
+                    b.Navigation("ReportesDanios");
+                });
+
+            modelBuilder.Entity("InventoryApi.Models.Vehiculo", b =>
+                {
+                    b.Navigation("AlertasServicio");
+
+                    b.Navigation("BitacoraFallas");
+
+                    b.Navigation("HistorialReparaciones");
+
+                    b.Navigation("Mantenimientos");
+
+                    b.Navigation("PolizasSeguro");
+
+                    b.Navigation("ReportesEstadoFisico");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,6 +9,7 @@ namespace Inventory.Data
     public class InventarioContext : DbContext
     {
         public InventarioContext(DbContextOptions<InventarioContext> options) : base(options) { }
+
         public DbSet<Equipo> Equipos { get; set; }
         public DbSet<Ubicacion> Ubicaciones { get; set; }
         public DbSet<EmpleadoInfo> EmpleadosInfo { get; set; }
@@ -36,9 +37,110 @@ namespace Inventory.Data
         public DbSet<TrasladoRetornoEquipo> TrasladoRetornEquipos { get; set; }
         public DbSet<TrasladoRetornoEmpleado> TrasladoRetornoEmpleados { get; set; }
         public DbSet<HojaResponsabilidadVersion> HojaResponsabilidadVersiones { get; set; }
+
+        public DbSet<MobiliarioEquipo> MobiliarioEquipos { get; set; }
+        public DbSet<ReporteDanio> ReportesDanios { get; set; }
+
+        // Módulo de Inmuebles
+        public DbSet<Inmueble> Inmuebles { get; set; }
+        public DbSet<InmuebleArchivo> InmuebleArchivos { get; set; }
+        public DbSet<PolizaSeguro> PolizasSeguro { get; set; }
+
+        // Módulo de Vehículos
+        public DbSet<Vehiculo> Vehiculos { get; set; }
+        public DbSet<HistorialReparacionVehiculo> HistorialReparaciones { get; set; }
+        public DbSet<MantenimientoVehiculo> MantenimientosVehiculo { get; set; }
+        public DbSet<AlertaServicioVehiculo> AlertasServicioVehiculo { get; set; }
+        public DbSet<BitacoraFallaVehiculo> BitacoraFallasVehiculo { get; set; }
+        public DbSet<PolizaSeguroVehiculo> PolizasSeguroVehiculo { get; set; }
+        public DbSet<ReporteEstadoFisicoVehiculo> ReportesEstadoFisicoVehiculo { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Configuración Módulo Inmuebles
+            modelBuilder.Entity<Inmueble>(entity =>
+            {
+                entity.HasKey(i => i.Id);
+
+                entity.HasMany(i => i.Archivos)
+                      .WithOne(a => a.Inmueble)
+                      .HasForeignKey(a => a.InmuebleId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(i => i.Polizas)
+                      .WithOne(p => p.Inmueble)
+                      .HasForeignKey(p => p.InmuebleId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configuración MobiliarioEquipo y ReporteDanio
+            modelBuilder.Entity<MobiliarioEquipo>(entity =>
+            {
+                entity.HasKey(m => m.Id);
+
+                entity.HasMany(m => m.ReportesDanios)
+                      .WithOne(r => r.MobiliarioEquipo)
+                      .HasForeignKey(r => r.MobiliarioEquipoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ================== Módulo de Vehículos ==================
+            modelBuilder.Entity<Vehiculo>(entity =>
+            {
+                entity.HasKey(v => v.Id);
+
+                entity.HasIndex(v => v.Vin);
+                entity.HasIndex(v => v.Placa);
+
+                entity.Property(v => v.Vin).HasMaxLength(17);
+                entity.Property(v => v.Placa).HasMaxLength(20);
+                entity.Property(v => v.Color).HasMaxLength(50);
+                entity.Property(v => v.TipoCombustible).HasMaxLength(30);
+
+                entity.HasMany(v => v.HistorialReparaciones)
+                      .WithOne(r => r.Vehiculo)
+                      .HasForeignKey(r => r.VehiculoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(v => v.Mantenimientos)
+                      .WithOne(m => m.Vehiculo)
+                      .HasForeignKey(m => m.VehiculoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(v => v.AlertasServicio)
+                      .WithOne(a => a.Vehiculo)
+                      .HasForeignKey(a => a.VehiculoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(v => v.BitacoraFallas)
+                      .WithOne(f => f.Vehiculo)
+                      .HasForeignKey(f => f.VehiculoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(v => v.PolizasSeguro)
+                      .WithOne(p => p.Vehiculo)
+                      .HasForeignKey(p => p.VehiculoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(v => v.ReportesEstadoFisico)
+                      .WithOne(r => r.Vehiculo)
+                      .HasForeignKey(r => r.VehiculoId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<HistorialReparacionVehiculo>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+                entity.Property(r => r.Costo).HasColumnType("decimal(18,2)");
+            });
+
+            modelBuilder.Entity<PolizaSeguroVehiculo>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.Property(p => p.Prima).HasColumnType("decimal(18,2)");
+            });
 
             // Tablas de Softland — solo lectura, no pertenecen a esta BD
             modelBuilder.Entity<EmpleadoInfo>(entity =>
@@ -74,9 +176,9 @@ namespace Inventory.Data
             });
 
             modelBuilder.Entity<HojaSolvencia>()
-            .HasOne(s => s.HojaResponsabilidad)
-            .WithMany(h => h.Solvencias)
-            .HasForeignKey(s => s.HojaResponsabilidadId);
+                .HasOne(s => s.HojaResponsabilidad)
+                .WithMany(h => h.Solvencias)
+                .HasForeignKey(s => s.HojaResponsabilidadId);
 
             modelBuilder.Entity<HojaResponsabilidadVersion>(entity =>
             {
@@ -168,3 +270,4 @@ namespace Inventory.Data
         }
     }
 }
+
