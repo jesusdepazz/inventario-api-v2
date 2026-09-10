@@ -51,7 +51,7 @@ namespace Inventory.Data
         public DbSet<HistorialReparacionVehiculo> HistorialReparaciones { get; set; }
         public DbSet<MantenimientoVehiculo> MantenimientosVehiculo { get; set; }
         public DbSet<AlertaServicioVehiculo> AlertasServicioVehiculo { get; set; }
-        public DbSet<BitacoraFallaVehiculo> BitacoraFallasVehiculo { get; set; }
+        public DbSet<BitacoraFallaVehiculo> BitacorasFallasVehiculo { get; set; }
         public DbSet<PolizaSeguroVehiculo> PolizasSeguroVehiculo { get; set; }
         public DbSet<ReporteEstadoFisicoVehiculo> ReportesEstadoFisicoVehiculo { get; set; }
 
@@ -59,7 +59,21 @@ namespace Inventory.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configuración Módulo Inmuebles
+            // ================== Configuración para OtrosActivosController / Equipos ==================
+            modelBuilder.Entity<Equipo>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                // Índices únicos o de optimización basados en las validaciones del controlador (AnyAsync)
+                entity.HasIndex(e => e.Codificacion).IsUnique();
+
+                // Si la serie puede ser nula o vacía en algunos registros, se puede configurar adecuadamente, 
+                // pero aquí dejamos el mapeo base y restricciones comunes.
+                entity.Property(e => e.Codificacion).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Serie).HasMaxLength(100);
+            });
+
+            // ================== Configuración Módulo Inmuebles ==================
             modelBuilder.Entity<Inmueble>(entity =>
             {
                 entity.HasKey(i => i.Id);
@@ -270,4 +284,3 @@ namespace Inventory.Data
         }
     }
 }
-
